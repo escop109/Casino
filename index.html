@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Онлайн Казино</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ecf0f1;
+            padding: 20px;
+            margin: 0;
+            text-align: center;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        #balance {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        button:hover {
+            background-color: #2980b9;
+            transform: scale(1.05);
+        }
+        .admin-btn {
+            background-color: #e74c3c;
+            font-weight: bold;
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+        }
+        .admin-btn:hover {
+            background-color: #c0392b;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        nav ul li {
+            display: inline;
+        }
+        nav ul li a {
+            text-decoration: none;
+            color: white;
+            background-color: #3498db;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 18px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        nav ul li a:hover {
+            background-color: #2980b9;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <h1>Онлайн Казино</h1>
+
+    <!-- Навигация -->
+    <nav>
+        <ul>
+            <li><a href="index.html">Главная</a></li>
+            <li><a href="login.html">Вход</a></li>
+            <li><a href="register.html">Регистрация</a></li>
+            <li><a href="contact.html">Контакты</a></li>
+        </ul>
+    </nav>
+
+    <p id="balance">Баланс: 0 кредитов</p>
+    <button onclick="claimBonus()">Получить бонус</button>
+    <button onclick="playSlot()">Играть в слот</button>
+    <button onclick="playPoker()">Играть в покер</button>
+    
+    <button class="admin-btn" onclick="enterAdminRoom()">Админ-комната</button>
+    
+    <p id="bonus-status"></p>
+    <p id="game-result"></p>
+
+    <script>
+        let balance = localStorage.getItem('balance') ? parseFloat(localStorage.getItem('balance')) : 0;
+        let bonusClaimedToday = localStorage.getItem('bonusClaimedToday') ? parseInt(localStorage.getItem('bonusClaimedToday')) : 0;
+
+        function updateBalance() {
+            document.getElementById('balance').innerText = `Баланс: ${balance.toFixed(0)} кредитов`;
+        }
+
+        function claimBonus() {
+            if (bonusClaimedToday < 10) {
+                let bonus = Math.floor(Math.random() * 500) + 100;
+                balance += bonus;
+                bonusClaimedToday++;
+                localStorage.setItem('balance', balance);
+                localStorage.setItem('bonusClaimedToday', bonusClaimedToday);
+                document.getElementById('bonus-status').innerText = `Вы получили бонус: ${bonus} кредитов! Осталось бонусов сегодня: ${10 - bonusClaimedToday}`;
+            } else {
+                document.getElementById('bonus-status').innerText = 'Вы уже забрали все бонусы на сегодня!';
+            }
+            updateBalance();
+        }
+
+        function playSlot() {
+            if (balance < 100) {
+                document.getElementById('game-result').innerText = 'Недостаточно средств для игры в слот!';
+                return;
+            }
+            balance -= 100;
+            let result = ["🍒", "🍋", "🍉", "🍇", "⭐", "💎"];
+            let slot1 = result[Math.floor(Math.random() * result.length)];
+            let slot2 = result[Math.floor(Math.random() * result.length)];
+            let slot3 = result[Math.floor(Math.random() * result.length)];
+            document.getElementById('game-result').innerText = `${slot1} | ${slot2} | ${slot3}`;
+            if (slot1 === slot2 && slot2 === slot3) {
+                let winAmount = 1000;
+                balance += winAmount;
+                document.getElementById('game-result').innerText = `Поздравляем! Вы выиграли ${winAmount} кредитов! ${slot1} | ${slot2} | ${slot3}`;
+            } else {
+                document.getElementById('game-result').innerText = `Попробуйте еще раз! ${slot1} | ${slot2} | ${slot3}`;
+            }
+            localStorage.setItem('balance', balance);
+            updateBalance();
+        }
+
+        function playPoker() {
+            if (balance < 500) {
+                document.getElementById('game-result').innerText = 'Недостаточно средств для игры в покер!';
+                return;
+            }
+            balance -= 500;
+            let playerHand = Math.floor(Math.random() * 21) + 10;
+            let dealerHand = Math.floor(Math.random() * 21) + 10;
+            document.getElementById('game-result').innerText = `Вы: ${playerHand}, Казино: ${dealerHand}`;
+            if (playerHand > dealerHand) {
+                let winAmount = 1000;
+                balance += winAmount;
+                document.getElementById('game-result').innerText = `Вы выиграли ${winAmount} кредитов!`;
+            } else {
+                document.getElementById('game-result').innerText = 'Вы проиграли. Попробуйте снова!';
+            }
+            localStorage.setItem('balance', balance);
+            updateBalance();
+        }
+
+        function enterAdminRoom() {
+            let password = prompt("Введите пароль для входа в админ-комнату:");
+            if (password === "dp$RbB34") {
+                window.location.href = "admin.html";
+            } else {
+                alert("Неверный пароль!");
+            }
+        }
+
+        updateBalance();
+    </script>
+</body>
+</html>
